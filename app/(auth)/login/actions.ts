@@ -121,7 +121,20 @@ export async function loginAction(
     username: profile.username,
   });
 
-  await createUserSession(profile.id);
+  try {
+    await createUserSession(profile.id);
+  } catch (error) {
+    console.error("[auth] Failed to create login session.", error);
+
+    return {
+      status: "error",
+      message: "Unable to start your session right now. Please contact the site admin.",
+      fieldErrors: {},
+      formValues: {
+        email,
+      },
+    };
+  }
 
   redirect(authenticatedProfile.isAdmin ? "/admin" : "/dashboard");
 }
