@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id           String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String?             @unique
+  isAdmin      Boolean             @default(false) @map("is_admin")
+  whatsapp     String?
+  username     String              @unique
+  passwordHash String              @map("password_hash")
+  subscription MemberSubscription?
+  guideUnlocks MemberGuideUnlock[]
+  guidePayments MemberGuidePaymentTransaction[]
+
+  @@map("profiles")
+}
+
+model HomepageContent {
+  id        String   @id @default("homepage")
+  hero      Json
+  overview  Json
+  benefits  Json
+  pricing   Json
+  video     Json
+  faq       Json
+  guide     Json
+  testimonial Json
+  blog      Json
+  bannerAds Json   @map("banner_ads")
+  footer    Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_content")
+}
+
+model HomepageAsset {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label     String
+  publicId  String   @unique @map("public_id")
+  secureUrl String   @map("secure_url")
+  width     Int?
+  height    Int?
+  bytes     Int?
+  format    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_assets")
+}
+
+model SiteSeoSettings {
+  id                     String   @id @default("site")
+  siteName               String   @map("site_name")
+  siteUrl                String   @map("site_url")
+  homeTitle              String   @map("home_title")
+  homeDescription        String   @map("home_description")
+  openGraphTitle         String   @map("open_graph_title")
+  openGraphDescription   String   @map("open_graph_description")
+  faviconAssetId         String?  @map("favicon_asset_id")
+  faviconUrl             String?  @map("favicon_url")
+  openGraphImageAssetId  String?  @map("open_graph_image_asset_id")
+  openGraphImageUrl      String?  @map("open_graph_image_url")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("site_seo_settings")
+}
+
+model PaymentGatewaySettings {
+  id                 String   @id @default("signup")
+  provider           String   @default("paymenku")
+  isEnabled          Boolean  @default(false) @map("is_enabled")
+  paymenkuApiKey     String?  @map("paymenku_api_key")
+  activeChannelCodes Json     @map("active_channel_codes")
+  defaultChannelCode String?  @map("default_channel_code")
+  subscriptionPlans  Json     @map("subscription_plans")
+  defaultPlanId      String   @default("1-year") @map("default_plan_id")
+  registrationPrice  Int      @default(1000) @map("registration_price")
+  priceLabel         String   @default("Biaya Pendaftaran") @map("price_label")
+  checkoutNote       String   @default("Pilih metode pembayaran yang tersedia untuk menyelesaikan pendaftaran.") @map("checkout_note")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_gateway_settings")
+}
+
+model SignupPaymentTransaction {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceId           String   @unique @map("reference_id")
+  provider              String   @default("paymenku")
+  providerTransactionId String?  @map("provider_transaction_id")
+  status                String   @default("pending")
+  channelCode           String   @map("channel_code")
+  amount                Int
+  customerName          String   @map("customer_name")
+  customerEmail         String   @map("customer_email")
+  customerPhone         String?  @map("customer_phone")
+  planId                String?  @map("plan_id")
+  planLabel             String?  @map("plan_label")
+  message               String?
+  paymentName           String?  @map("payment_name")
+  paymentNumber         String?  @map("payment_number")
+  paymentUrl            String?  @map("payment_url")
+  qrImageUrl            String?  @map("qr_image_url")
+  qrString              String?  @map("qr_string")
+  expiresAt             String?  @map("expires_at")
+  consumedAt            DateTime? @map("consumed_at")
+  paidAt                DateTime? @map("paid_at")
+  rawCreateResponse     Json?    @map("raw_create_response")
+  rawStatusResponse     Json?    @map("raw_status_response")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([status, createdAt], map: "signup_payment_transactions_status_idx")
+  @@map("signup_payment_transactions")
+}
+
+model MemberSubscription {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId          String    @unique @db.Uuid @map("profile_id")
+  planId             String    @map("plan_id")
+  planLabel          String    @map("plan_label")
+  isLifetime         Boolean   @default(false) @map("is_lifetime")
+  durationMonths     Int       @default(12) @map("duration_months")
+  startedAt          DateTime  @default(now()) @map("started_at")
+  expiresAt          DateTime? @map("expires_at")
+  status             String    @default("active")
+  paymentReferenceId String?   @unique @map("payment_reference_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  profile            Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([status, expiresAt], map: "member_subscriptions_status_idx")
+  @@map("member_subscriptions")
+}
+
+model BlogPost {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String
+  slug                String   @unique
+  category            String   @default("Crypto News")
+  excerpt             String
+  content             String
+  seoTitle            String?  @map("seo_title")
+  seoDescription      String?  @map("seo_description")
+  thumbnailAssetId    String?  @map("thumbnail_asset_id")
+  thumbnailUrl        String?  @map("thumbnail_url")
+  openGraphAssetId    String?  @map("open_graph_asset_id")
+  openGraphImageUrl   String?  @map("open_graph_image_url")
+  isPublished         Boolean  @default(true) @map("is_published")
+  publishedAt         DateTime @default(now()) @map("published_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@index([isPublished, publishedAt], map: "blog_posts_published_idx")
+  @@map("blog_posts")
+}
+
+model MemberGuideAsset {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label            String
+  publicId         String   @unique @map("public_id")
+  secureUrl        String   @map("secure_url")
+  originalFilename String?  @map("original_filename")
+  bytes            Int?
+  format           String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("member_guide_assets")
+}
+
+model PublicGuideAsset {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label            String
+  publicId         String   @unique @map("public_id")
+  secureUrl        String   @map("secure_url")
+  originalFilename String?  @map("original_filename")
+  bytes            Int?
+  format           String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("public_guide_assets")
+}
+
+model PublicGuidePdfPost {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+  fileAssetId String?  @db.Uuid @map("file_asset_id")
+  fileUrl     String   @map("file_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  publishedAt DateTime @default(now()) @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([isPublished, sortOrder, publishedAt], map: "public_guide_pdf_posts_published_idx")
+  @@map("public_guide_pdf_posts")
+}
+
+model MemberGuidePost {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type        String
+  section     String
+  title       String
+  description String
+  embedUrl    String?  @map("embed_url")
+  fileAssetId String?  @db.Uuid @map("file_asset_id")
+  fileUrl     String?  @map("file_url")
+  isPaid      Boolean  @default(false) @map("is_paid")
+  price       Int?     @map("price")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  publishedAt DateTime @default(now()) @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  unlocks     MemberGuideUnlock[]
+  payments    MemberGuidePaymentTransaction[]
+
+  @@index([isPublished, sortOrder, publishedAt], map: "member_guide_posts_published_idx")
+  @@index([section, isPublished, sortOrder], map: "member_guide_posts_section_idx")
+  @@map("member_guide_posts")
+}
+
+model MemberGuidePaymentTransaction {
+  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceId           String          @unique @map("reference_id")
+  provider              String          @default("paymenku")
+  providerTransactionId String?         @map("provider_transaction_id")
+  status                String          @default("pending")
+  profileId             String          @db.Uuid @map("profile_id")
+  guidePostId           String          @db.Uuid @map("guide_post_id")
+  channelCode           String          @map("channel_code")
+  amount                Int
+  customerName          String          @map("customer_name")
+  customerEmail         String          @map("customer_email")
+  customerPhone         String?         @map("customer_phone")
+  guideTitle            String          @map("guide_title")
+  message               String?
+  paymentName           String?         @map("payment_name")
+  paymentNumber         String?         @map("payment_number")
+  paymentUrl            String?         @map("payment_url")
+  qrImageUrl            String?         @map("qr_image_url")
+  qrString              String?         @map("qr_string")
+  expiresAt             String?         @map("expires_at")
+  consumedAt            DateTime?       @map("consumed_at")
+  paidAt                DateTime?       @map("paid_at")
+  rawCreateResponse     Json?           @map("raw_create_response")
+  rawStatusResponse     Json?           @map("raw_status_response")
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+  profile               Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  guidePost             MemberGuidePost @relation(fields: [guidePostId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt], map: "member_guide_payment_transactions_status_idx")
+  @@index([profileId, guidePostId, status], map: "member_guide_payment_transactions_profile_guide_status_idx")
+  @@map("member_guide_payment_transactions")
+}
+
+model MemberGuideUnlock {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId          String          @db.Uuid @map("profile_id")
+  guidePostId        String          @db.Uuid @map("guide_post_id")
+  amount             Int
+  paymentReferenceId String?         @unique @map("payment_reference_id")
+  unlockedAt         DateTime        @default(now()) @map("unlocked_at")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  profile            Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  guidePost          MemberGuidePost @relation(fields: [guidePostId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, guidePostId], map: "member_guide_unlocks_profile_id_guide_post_id_key")
+  @@index([guidePostId], map: "member_guide_unlocks_guide_post_id_idx")
+  @@map("member_guide_unlocks")
+}
