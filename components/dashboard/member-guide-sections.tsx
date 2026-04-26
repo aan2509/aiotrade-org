@@ -798,7 +798,7 @@ export function MemberLearningGuideSection({
                           <button
                             className={`w-full rounded-[24px] px-4 py-4 text-left transition duration-300 ${
                               active
-                                ? "text-[var(--member-sidebar-active-text)]"
+                                ? "text-[var(--member-text-primary)] dark:text-[var(--member-sidebar-active-text)]"
                                 : "member-row-surface text-[var(--member-text-primary)]"
                             }`}
                             key={guide.id}
@@ -817,7 +817,7 @@ export function MemberLearningGuideSection({
                               <span
                                 className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
                                   active
-                                    ? "bg-white/18 text-[var(--member-sidebar-active-text)]"
+                                    ? "bg-sky-500/12 text-sky-800 dark:bg-sky-100/50 dark:text-[var(--member-sidebar-active-text)]"
                                     : "member-icon-surface"
                                 }`}
                               >
@@ -829,18 +829,22 @@ export function MemberLearningGuideSection({
                               </span>
                               <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <p className="text-sm font-semibold">{guide.title}</p>
+                                  <p className={`text-sm font-semibold ${active ? `${memberTextPrimaryClass} dark:text-[var(--member-sidebar-active-text)]` : ""}`}>
+                                    {guide.title}
+                                  </p>
                                   <span
-                                    className={`rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] ${
+                                    className={`rounded-full px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] ${
                                       guide.isPaid
-                                        ? active
-                                          ? "bg-white/16 text-white"
-                                          : unlocked
-                                            ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
-                                            : "bg-amber-500/12 text-amber-700 dark:text-amber-200"
+                                        ? unlocked
+                                          ? active
+                                            ? "bg-emerald-100 text-emerald-900"
+                                            : "bg-emerald-100 text-emerald-900 dark:bg-emerald-400/18 dark:text-emerald-50"
+                                          : active
+                                            ? "bg-amber-100 text-amber-900"
+                                            : "bg-amber-100 text-amber-900 dark:bg-amber-300/20 dark:text-amber-50"
                                         : active
-                                          ? "bg-white/16 text-white"
-                                          : "bg-sky-500/12 text-sky-700 dark:text-sky-200"
+                                          ? "bg-sky-100 text-sky-900"
+                                          : "bg-sky-100 text-sky-900 dark:bg-sky-300/20 dark:text-sky-50"
                                     }`}
                                   >
                                     {guide.isPaid
@@ -852,7 +856,9 @@ export function MemberLearningGuideSection({
                                 </div>
                                 <p
                                   className={`mt-2 text-xs leading-6 ${
-                                    active ? "opacity-75" : "text-[var(--member-text-muted)]"
+                                    active
+                                      ? `${memberTextSecondaryClass} dark:text-[var(--member-sidebar-active-text)]`
+                                      : memberTextMutedClass
                                   }`}
                                 >
                                   {guide.description}

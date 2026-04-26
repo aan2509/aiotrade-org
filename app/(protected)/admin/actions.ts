@@ -66,6 +66,18 @@ const heroSchema = z.object({
 
 const overviewSchema = z.object({
   background: sectionBackgroundSchema,
+  brandAccentColor: z.string().optional(),
+  brandAccentLength: z.number().int().min(1).max(24).optional(),
+  brandDisplayMode: z.enum(["logo", "text"]).optional(),
+  brandRestColor: z.string().optional(),
+  brandText: z.string().min(1).optional(),
+  brandTextSize: z.object({
+    mobileSize: z.number().int().min(32).max(96),
+    desktopSize: z.number().int().min(48).max(160),
+  }).refine((value) => value.desktopSize >= value.mobileSize, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopSize"],
+  }).optional(),
   titleBlue: z.string().min(1),
   titleWhite: z.string().min(1),
   description: z.string().min(1),
@@ -207,6 +219,7 @@ const blogSchema = z.object({
 
 const bannerAdsSchema = z.object({
   background: sectionBackgroundSchema,
+  buttonHref: z.string().optional(),
   buttonLabel: z.string().min(1),
   description: z.string().min(1),
   imageAssetId: z.string().optional(),
@@ -261,6 +274,15 @@ export async function updateOverviewSectionAction(formData: FormData) {
 
   const parsed = overviewSchema.safeParse({
     background: readPaletteOnlyBackground(formData),
+    brandAccentColor: normalizeHexColor(readString(formData, "brandAccentColor"), "#0ea5ff"),
+    brandAccentLength: readNumber(formData, "brandAccentLength") ?? 3,
+    brandDisplayMode: readString(formData, "brandDisplayMode") === "text" ? "text" : "logo",
+    brandRestColor: normalizeHexColor(readString(formData, "brandRestColor"), "#f8fafc"),
+    brandText: readString(formData, "brandText") || "AIOTrade",
+    brandTextSize: {
+      mobileSize: readNumber(formData, "brandTextMobileSize") ?? 48,
+      desktopSize: readNumber(formData, "brandTextDesktopSize") ?? 104,
+    },
     titleBlue: readString(formData, "titleBlue"),
     titleWhite: readString(formData, "titleWhite"),
     description: readString(formData, "description"),
@@ -493,6 +515,7 @@ export async function updateBannerAdsSectionAction(formData: FormData) {
 
   const parsed = bannerAdsSchema.safeParse({
     background: readPaletteOnlyBackground(formData),
+    buttonHref: readString(formData, "buttonHref") || undefined,
     buttonLabel: readString(formData, "buttonLabel"),
     description: readString(formData, "description"),
     imageAssetId: readString(formData, "imageAssetId") || undefined,

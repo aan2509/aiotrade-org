@@ -64,13 +64,51 @@ function TextField({ label, name, onChange, value }: FieldProps) {
   );
 }
 
-function NumberField({
+function ColorField({
   label,
   name,
   onChange,
   value,
 }: {
   label: string;
+  name: string;
+  onChange: (value: string) => void;
+  value: string;
+}) {
+  const colorPickerValue = /^#[0-9a-f]{6}$/i.test(value) ? value : "#000000";
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <div className="flex items-center gap-3 rounded-[18px] bg-white px-3 py-3">
+        <Input
+          className="h-10 w-14 shrink-0 rounded-xl border-transparent p-1"
+          id={name}
+          onChange={(event) => onChange(event.target.value)}
+          type="color"
+          value={colorPickerValue}
+        />
+        <Input
+          className="rounded-[14px] border-transparent px-3"
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+        />
+      </div>
+    </div>
+  );
+}
+
+function NumberField({
+  label,
+  max,
+  min = 150,
+  name,
+  onChange,
+  value,
+}: {
+  label: string;
+  max?: number;
+  min?: number;
   name: string;
   onChange: (value: number) => void;
   value: number;
@@ -81,7 +119,8 @@ function NumberField({
       <Input
         className="rounded-[18px] border-transparent px-4"
         id={name}
-        min={150}
+        max={max}
+        min={min}
         name={name}
         onChange={(event) => onChange(Number.parseInt(event.target.value || "0", 10) || 0)}
         step={1}
@@ -492,6 +531,7 @@ export function HomepageSettingsView({
             <SectionAlert currentSection={section} label="Banner ads section" section="bannerAds" status={status} />
             <form action={updateBannerAdsSectionAction} className="space-y-5">
               <input name="title" type="hidden" value={draft.bannerAds.title} />
+              <input name="buttonHref" type="hidden" value={draft.bannerAds.buttonHref ?? ""} />
               <input name="buttonLabel" type="hidden" value={draft.bannerAds.buttonLabel} />
               <input name="description" type="hidden" value={draft.bannerAds.description} />
               <input name="imageAlt" type="hidden" value={draft.bannerAds.imageAlt ?? ""} />
@@ -706,6 +746,13 @@ export function HomepageSettingsView({
             <form action={updateOverviewSectionAction} className="space-y-5">
               <input name="titleBlue" type="hidden" value={draft.overview.titleBlue} />
               <input name="titleWhite" type="hidden" value={draft.overview.titleWhite} />
+              <input name="brandAccentColor" type="hidden" value={draft.overview.brandAccentColor ?? "#0ea5ff"} />
+              <input name="brandDisplayMode" type="hidden" value={draft.overview.brandDisplayMode ?? "logo"} />
+              <input name="brandRestColor" type="hidden" value={draft.overview.brandRestColor ?? "#f8fafc"} />
+              <input name="brandText" type="hidden" value={draft.overview.brandText ?? "AIOTrade"} />
+              <input name="brandAccentLength" type="hidden" value={String(draft.overview.brandAccentLength ?? 3)} />
+              <input name="brandTextMobileSize" type="hidden" value={String(draft.overview.brandTextSize?.mobileSize ?? 48)} />
+              <input name="brandTextDesktopSize" type="hidden" value={String(draft.overview.brandTextSize?.desktopSize ?? 104)} />
               <input name="memberCtaTitle" type="hidden" value={draft.overview.memberCta.title} />
               <input name="memberCtaDescription" type="hidden" value={draft.overview.memberCta.description} />
               <input name="memberCtaButtonLabel" type="hidden" value={draft.overview.memberCta.buttonLabel} />
@@ -715,9 +762,9 @@ export function HomepageSettingsView({
               <input name="memberCtaOverlayColor" type="hidden" value={draft.overview.memberCta.overlayColor ?? "#07101d"} />
               <input name="memberCtaOverlayOpacity" type="hidden" value={String(draft.overview.memberCta.overlayOpacity ?? 52)} />
               <div className="admin-note-surface rounded-2xl px-4 py-3 text-sm leading-6">
-                Logo overview memakai asset brand yang sama dengan footer agar tampil konsisten di
-                desktop dan mobile. Ukuran tampilnya bisa kamu atur di bawah tanpa mengganti asset
-                logo. Judul teks lama disimpan otomatis supaya konfigurasi homepage tetap aman.
+                Overview bisa memakai logo brand atau teks besar satu kata. Untuk teks seperti
+                <strong> AIOTrade</strong>, atur jumlah karakter awal agar bagian pertama tampil
+                dengan warna aksen biru dan sisanya memakai warna teks utama landing page.
               </div>
               <input name="background-mode" type="hidden" value="palette" />
               <input
@@ -734,6 +781,103 @@ export function HomepageSettingsView({
               <input name="background-image-url" type="hidden" value="" />
               <input name="background-image-overlayColor" type="hidden" value="" />
               <input name="background-image-overlayOpacity" type="hidden" value="58" />
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <p className="text-sm font-semibold text-stone-900">Brand overview</p>
+                <div className="mt-3 grid gap-4">
+                  <SelectField
+                    label="Tampilan Brand"
+                    name="brandDisplayModeSelect"
+                    onChange={(value) =>
+                      updateSection("overview", {
+                        brandDisplayMode: value === "text" ? "text" : "logo",
+                      })
+                    }
+                    options={[
+                      { label: "Logo", value: "logo" },
+                      { label: "Teks Besar", value: "text" },
+                    ]}
+                    value={draft.overview.brandDisplayMode ?? "logo"}
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <TextField
+                      label="Teks Brand"
+                      name="brandTextInput"
+                      onChange={(value) => updateSection("overview", { brandText: value.replace(/\s+/g, "") })}
+                      value={draft.overview.brandText ?? "AIOTrade"}
+                    />
+                    <NumberField
+                      label="Jumlah karakter warna pertama"
+                      max={24}
+                      min={1}
+                      name="brandAccentLengthInput"
+                      onChange={(value) => updateSection("overview", { brandAccentLength: value })}
+                      value={draft.overview.brandAccentLength ?? 3}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <ColorField
+                      label="Warna Teks Depan"
+                      name="brandAccentColorInput"
+                      onChange={(value) => updateSection("overview", { brandAccentColor: value })}
+                      value={draft.overview.brandAccentColor ?? "#0ea5ff"}
+                    />
+                    <ColorField
+                      label="Warna Teks Belakang"
+                      name="brandRestColorInput"
+                      onChange={(value) => updateSection("overview", { brandRestColor: value })}
+                      value={draft.overview.brandRestColor ?? "#f8fafc"}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                      <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                        <Smartphone className="h-4 w-4" />
+                        Mobile
+                      </div>
+                      <NumberField
+                        label="Ukuran teks mobile (px)"
+                        max={96}
+                        min={32}
+                        name="brandTextMobileSizeInput"
+                        onChange={(value) =>
+                          updateSection("overview", {
+                            brandTextSize: {
+                              desktopSize: draft.overview.brandTextSize?.desktopSize ?? 104,
+                              mobileSize: value,
+                            },
+                          })
+                        }
+                        value={draft.overview.brandTextSize?.mobileSize ?? 48}
+                      />
+                    </div>
+                    <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                      <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                        <Monitor className="h-4 w-4" />
+                        Desktop
+                      </div>
+                      <NumberField
+                        label="Ukuran teks desktop (px)"
+                        max={160}
+                        min={48}
+                        name="brandTextDesktopSizeInput"
+                        onChange={(value) =>
+                          updateSection("overview", {
+                            brandTextSize: {
+                              desktopSize: value,
+                              mobileSize: draft.overview.brandTextSize?.mobileSize ?? 48,
+                            },
+                          })
+                        }
+                        value={draft.overview.brandTextSize?.desktopSize ?? 104}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs leading-6 text-stone-500">
+                  Contoh untuk <code>AIOTrade</code>: isi jumlah karakter warna pertama dengan <code>3</code>
+                  agar <code>AIO</code> biru dan <code>Trade</code> mengikuti warna teks utama.
+                </p>
+              </div>
               <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
                 <p className="text-sm font-semibold text-stone-900">Ukuran logo overview</p>
                 <div className="mt-3 grid gap-4 md:grid-cols-2">
@@ -1625,6 +1769,15 @@ export function HomepageSettingsView({
                   value={draft.bannerAds.buttonLabel}
                 />
               </div>
+              <TextField
+                label="Link Tombol Banner"
+                name="buttonHref"
+                onChange={(value) => updateSection("bannerAds", { buttonHref: value })}
+                value={draft.bannerAds.buttonHref ?? ""}
+              />
+              <p className="text-xs leading-6 text-stone-500">
+                Bisa memakai link internal seperti <code>/signup</code> atau link eksternal penuh seperti <code>https://...</code>.
+              </p>
               <TextAreaField
                 label="Deskripsi"
                 name="description"
@@ -1634,7 +1787,7 @@ export function HomepageSettingsView({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <TextField
-                  label="Nomor WhatsApp Admin"
+                  label="Nomor WhatsApp Floating"
                   name="whatsappNumber"
                   onChange={(value) => updateSection("bannerAds", { whatsappNumber: value })}
                   value={draft.bannerAds.whatsappNumber ?? ""}

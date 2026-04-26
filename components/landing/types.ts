@@ -116,6 +116,11 @@ export type LogoSizeConfig = {
   desktopWidth: number;
 };
 
+export type BrandTextSizeConfig = {
+  mobileSize: number;
+  desktopSize: number;
+};
+
 export type ButtonPaletteKey =
   | "glass-default"
   | "brand-blue"
@@ -126,6 +131,12 @@ export type ButtonPaletteKey =
 
 export type OverviewContent = {
   background: SectionBackgroundConfig;
+  brandAccentColor?: string;
+  brandAccentLength?: number;
+  brandDisplayMode?: "logo" | "text";
+  brandRestColor?: string;
+  brandText?: string;
+  brandTextSize?: BrandTextSizeConfig;
   titleBlue: string;
   titleWhite: string;
   description: string;
@@ -229,6 +240,7 @@ export type BlogContent = {
 
 export type BannerAdsContent = {
   background: SectionBackgroundConfig;
+  buttonHref?: string;
   buttonLabel: string;
   description: string;
   imageAssetId?: string;

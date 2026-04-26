@@ -13,11 +13,16 @@ type BannerAdsSectionProps = {
 };
 
 export function BannerAdsSection({ content }: BannerAdsSectionProps) {
+  const buttonHref = content.buttonHref?.trim() || null;
   const whatsappHref = content.whatsappNumber
     ? buildWhatsAppUrl(content.whatsappNumber, {
         message: "Halo admin, saya tertarik untuk membeli kaos komunitas AIOTrade.",
       })
     : null;
+  const actionHref = buttonHref ?? whatsappHref;
+  const isExternalAction = actionHref
+    ? /^https?:\/\//i.test(actionHref) || actionHref.startsWith("mailto:") || actionHref.startsWith("tel:")
+    : false;
 
   if (!content.isVisible) {
     return null;
@@ -59,19 +64,19 @@ export function BannerAdsSection({ content }: BannerAdsSectionProps) {
             )}
 
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-start p-3 sm:p-5 lg:p-6">
-              {whatsappHref ? (
+              {actionHref ? (
                 <Link
                   className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-white/22 bg-[rgba(34,197,94,0.94)] px-4 text-[0.92rem] font-semibold text-white shadow-[0_14px_32px_rgba(15,23,42,0.26),inset_0_1px_0_rgba(255,255,255,0.24)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-[rgba(34,197,94,1)] hover:shadow-[0_18px_36px_rgba(15,23,42,0.3)] sm:min-h-11 sm:px-5 sm:text-[0.96rem] lg:min-h-12 lg:px-6"
-                  href={whatsappHref}
-                  rel="noopener noreferrer"
-                  target="_blank"
+                  href={actionHref}
+                  rel={isExternalAction ? "noopener noreferrer" : undefined}
+                  target={isExternalAction ? "_blank" : undefined}
                 >
                   {content.buttonLabel}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               ) : (
                 <span className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/32 bg-[rgba(255,255,255,0.9)] px-4 text-[0.92rem] font-semibold text-stone-500 shadow-[0_12px_28px_rgba(15,23,42,0.14)] backdrop-blur sm:min-h-11 sm:px-5 lg:min-h-12 lg:px-6">
-                  Nomor WhatsApp belum diatur
+                  Link tombol belum diatur
                 </span>
               )}
             </div>

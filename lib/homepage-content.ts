@@ -23,6 +23,18 @@ const heroSchema = z.object({
 
 const overviewSchema = z.object({
   background: sectionBackgroundSchema,
+  brandAccentColor: z.string().optional(),
+  brandAccentLength: z.number().int().min(1).max(24).optional(),
+  brandDisplayMode: z.enum(["logo", "text"]).optional(),
+  brandRestColor: z.string().optional(),
+  brandText: z.string().min(1).optional(),
+  brandTextSize: z.object({
+    mobileSize: z.number().int().min(32).max(96),
+    desktopSize: z.number().int().min(48).max(160),
+  }).refine((value) => value.desktopSize >= value.mobileSize, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopSize"],
+  }).optional(),
   titleBlue: z.string().min(1),
   titleWhite: z.string().min(1),
   description: z.string().min(1),
@@ -145,6 +157,7 @@ const blogSchema = z.object({
 
 const bannerAdsSchema = z.object({
   background: sectionBackgroundSchema,
+  buttonHref: z.string().optional(),
   buttonLabel: z.string().min(1),
   description: z.string().min(1),
   imageAssetId: z.string().optional(),
@@ -189,6 +202,15 @@ export const defaultHomepageContent: HomepageContent = {
   },
   overview: {
     background: createDefaultSectionBackground("dark-navy"),
+    brandAccentColor: "#0ea5ff",
+    brandAccentLength: 3,
+    brandDisplayMode: "logo",
+    brandRestColor: "#f8fafc",
+    brandText: "AIOTrade",
+    brandTextSize: {
+      mobileSize: 48,
+      desktopSize: 104,
+    },
     titleBlue: "AIO",
     titleWhite: "TRADE",
     description:
@@ -305,6 +327,7 @@ export const defaultHomepageContent: HomepageContent = {
   },
   bannerAds: {
     background: createDefaultSectionBackground("warm-ivory"),
+    buttonHref: "",
     buttonLabel: "Pesan Sekarang",
     description: "Tampilkan banner kaos, merchandise, atau materi promo lain yang ingin diarahkan langsung ke WhatsApp admin.",
     imageAlt: "Banner merchandise AIOTrade",

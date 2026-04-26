@@ -21,6 +21,12 @@ function buildResponsiveLogoWidth(mobileWidth: number, desktopWidth: number) {
   };
 }
 
+function buildResponsiveBrandTextSize(mobileSize: number, desktopSize: number) {
+  return {
+    fontSize: `clamp(${mobileSize}px, 8vw, ${desktopSize}px)`,
+  };
+}
+
 type OverviewSectionProps = {
   content: OverviewContent;
   ctaExternal?: boolean;
@@ -37,6 +43,19 @@ export function OverviewSection({
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const lightMotion = useLightLandingMotion();
+  const brandText = (content.brandText?.trim() || `${content.titleBlue}${content.titleWhite}`).replace(/\s+/g, "");
+  const accentLength = Math.min(
+    Math.max(content.brandAccentLength ?? content.titleBlue.length, 1),
+    brandText.length,
+  );
+  const brandAccentText = brandText.slice(0, accentLength);
+  const brandRestText = brandText.slice(accentLength);
+  const brandTextSize = content.brandTextSize ?? {
+    desktopSize: 104,
+    mobileSize: 48,
+  };
+  const brandAccentColor = content.brandAccentColor ?? "var(--landing-accent-blue)";
+  const brandRestColor = content.brandRestColor ?? "var(--landing-text-primary)";
 
   return (
     <section className="relative overflow-hidden text-[var(--landing-text-primary)]" id="fitur" ref={sectionRef}>
@@ -85,14 +104,28 @@ export function OverviewSection({
               <Reveal className="w-full" delay={0.02} distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.7 : 1.12} stable>
                 <div className="w-full max-w-[22rem] mx-auto sm:max-w-[31rem] lg:mx-0 lg:max-w-[35rem]">
                   <div className="flex justify-center lg:justify-start">
-                    <LandingThemeLogo
-                      className="landing-overview-logo-image"
-                      sizes="(max-width: 640px) 188px, (max-width: 1024px) 228px, 274px"
-                      style={buildResponsiveLogoWidth(
-                        content.logoSize.mobileWidth,
-                        content.logoSize.desktopWidth,
-                      )}
-                    />
+                    {content.brandDisplayMode === "text" ? (
+                      <h2
+                        aria-label={brandText}
+                        className="leading-none font-black text-[var(--landing-text-primary)]"
+                        style={buildResponsiveBrandTextSize(
+                          brandTextSize.mobileSize,
+                          brandTextSize.desktopSize,
+                        )}
+                      >
+                        <span style={{ color: brandAccentColor }}>{brandAccentText}</span>
+                        <span style={{ color: brandRestColor }}>{brandRestText}</span>
+                      </h2>
+                    ) : (
+                      <LandingThemeLogo
+                        className="landing-overview-logo-image"
+                        sizes="(max-width: 640px) 188px, (max-width: 1024px) 228px, 274px"
+                        style={buildResponsiveLogoWidth(
+                          content.logoSize.mobileWidth,
+                          content.logoSize.desktopWidth,
+                        )}
+                      />
+                    )}
                   </div>
                   <p className="landing-overview-description mx-auto mt-5 max-w-[21rem] text-[0.92rem] leading-[1.86] text-[var(--landing-text-secondary)] sm:mt-6 sm:max-w-[27rem] sm:text-[1.04rem] sm:leading-[1.94] lg:mx-0 lg:max-w-[31rem] lg:text-[1.12rem] lg:leading-[2]">
                     {content.description}
