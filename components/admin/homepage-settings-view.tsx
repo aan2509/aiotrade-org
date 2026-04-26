@@ -556,6 +556,8 @@ export function HomepageSettingsView({
           <CardContent className="space-y-4">
             <SectionAlert currentSection={section} label="CTA member" section="memberJoinCta" status={status} />
             <form action={updateMemberJoinCtaAction} className="space-y-5">
+              <input name="backgroundImageAssetId" type="hidden" value={draft.overview.memberCta.backgroundImageAssetId ?? ""} />
+              <input name="backgroundImageUrl" type="hidden" value={draft.overview.memberCta.backgroundImageUrl ?? ""} />
               <div className="admin-note-surface rounded-2xl px-4 py-3 text-sm leading-6">
                 Halaman ini akan muncul sebagai menu baru di sidebar member dengan nama <strong>Daftar AIOTrade</strong>.
                 Gunakan link internal seperti <code>/signup</code> atau link eksternal penuh seperti <code>https://...</code>.
