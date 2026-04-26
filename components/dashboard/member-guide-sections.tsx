@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useEffectEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   BookOpen,
@@ -69,6 +69,18 @@ type GuideSectionLabels = {
   unlockSuccess: string;
   videoTitle: string;
 };
+
+function getGuideBadgeStyle(guide: MemberGuidePost, unlocked: boolean): CSSProperties {
+  return {
+    backgroundColor: guide.isPaid
+      ? unlocked
+        ? "#bbf7d0"
+        : "#fef3c7"
+      : "#dff4ff",
+    color: "#0f172a",
+    textShadow: "none",
+  };
+}
 
 type GuidePaymentFlowState = {
   message: string | null;
@@ -833,19 +845,8 @@ export function MemberLearningGuideSection({
                                     {guide.title}
                                   </p>
                                   <span
-                                    className={`rounded-full px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] ${
-                                      guide.isPaid
-                                        ? unlocked
-                                          ? active
-                                            ? "bg-emerald-100 text-emerald-900"
-                                            : "bg-emerald-100 text-emerald-900 dark:bg-emerald-400/18 dark:text-emerald-50"
-                                          : active
-                                            ? "bg-amber-100 text-amber-900"
-                                            : "bg-amber-100 text-amber-900 dark:bg-amber-300/20 dark:text-amber-50"
-                                        : active
-                                          ? "bg-sky-100 text-sky-900"
-                                          : "bg-sky-100 text-sky-900 dark:bg-sky-300/20 dark:text-sky-50"
-                                    }`}
+                                    className="rounded-full px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.14em]"
+                                    style={getGuideBadgeStyle(guide, unlocked)}
                                   >
                                     {guide.isPaid
                                       ? unlocked
