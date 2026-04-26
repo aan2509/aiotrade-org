@@ -9,6 +9,7 @@ import {
   CreditCard,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Settings2,
   UserRound,
 } from "lucide-react";
@@ -53,6 +54,7 @@ export function MemberSidebar({
   const accountOpen = isAccountRoute || accountExpanded;
   const primaryItems = [
     { href: "/dashboard", label: labels.primaryItems.dashboard, icon: LayoutDashboard },
+    { href: "/dashboard/daftar-aiotrade", label: labels.primaryItems.joinAiotrade, icon: Megaphone },
     { href: "/dashboard/subscription", label: labels.primaryItems.subscription, icon: CreditCard },
   ] as const;
   const guideItems = [

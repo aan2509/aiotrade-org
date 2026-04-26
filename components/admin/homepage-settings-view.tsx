@@ -13,6 +13,7 @@ import {
   updateFaqSectionAction,
   updateFooterSectionAction,
   updateGuideSectionAction,
+  updateMemberJoinCtaAction,
   updateOverviewSectionAction,
   updatePricingSectionAction,
   updateBannerAdsSectionAction,
@@ -544,6 +545,152 @@ export function HomepageSettingsView({
           </CardContent>
         </Card>
 
+        <Card className={cn(adminCardClass, "scroll-mt-24")} id="memberJoinCta-section">
+          <CardHeader>
+            <CardTitle>CTA Member: Daftar AIOTrade</CardTitle>
+            <CardDescription>
+              Kelola halaman CTA di dashboard member untuk mengarahkan user ke link join AIOTrade terbaru.
+              Link tombol di halaman ini bisa Anda ganti kapan saja dari admin.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SectionAlert currentSection={section} label="CTA member" section="memberJoinCta" status={status} />
+            <form action={updateMemberJoinCtaAction} className="space-y-5">
+              <div className="admin-note-surface rounded-2xl px-4 py-3 text-sm leading-6">
+                Halaman ini akan muncul sebagai menu baru di sidebar member dengan nama <strong>Daftar AIOTrade</strong>.
+                Gunakan link internal seperti <code>/signup</code> atau link eksternal penuh seperti <code>https://...</code>.
+              </div>
+              <TextField
+                label="Judul Halaman"
+                name="title"
+                onChange={(value) =>
+                  updateSection("overview", {
+                    memberCta: {
+                      ...draft.overview.memberCta,
+                      title: value,
+                    },
+                  })
+                }
+                value={draft.overview.memberCta.title}
+              />
+              <TextAreaField
+                label="Deskripsi"
+                name="description"
+                onChange={(value) =>
+                  updateSection("overview", {
+                    memberCta: {
+                      ...draft.overview.memberCta,
+                      description: value,
+                    },
+                  })
+                }
+                rows={4}
+                value={draft.overview.memberCta.description}
+              />
+              <TextField
+                label="Label Tombol"
+                name="buttonLabel"
+                onChange={(value) =>
+                  updateSection("overview", {
+                    memberCta: {
+                      ...draft.overview.memberCta,
+                      buttonLabel: value,
+                    },
+                  })
+                }
+                value={draft.overview.memberCta.buttonLabel}
+              />
+              <HomepageAssetPicker
+                assets={library}
+                cloudinaryEnabled={cloudinaryEnabled}
+                label="Background Banner CTA"
+                onAssetsChange={setLibrary}
+                onChange={(value) =>
+                  setDraft((current) => ({
+                    ...current,
+                    overview: {
+                      ...current.overview,
+                      memberCta: {
+                        ...current.overview.memberCta,
+                        backgroundImageAssetId: value.assetId,
+                        backgroundImageUrl: value.imageUrl,
+                      },
+                    },
+                  }))
+                }
+                previewAspectClassName="aspect-[21/8]"
+                value={{
+                  assetId: draft.overview.memberCta.backgroundImageAssetId,
+                  imageUrl: draft.overview.memberCta.backgroundImageUrl,
+                }}
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField
+                  label="Warna Overlay"
+                  name="overlayColor"
+                  onChange={(value) =>
+                    setDraft((current) => ({
+                      ...current,
+                      overview: {
+                        ...current.overview,
+                        memberCta: {
+                          ...current.overview.memberCta,
+                          overlayColor: value,
+                        },
+                      },
+                    }))
+                  }
+                  value={draft.overview.memberCta.overlayColor ?? "#07101d"}
+                />
+                <div className="grid gap-2">
+                  <Label htmlFor="overlayOpacity">Opacity Overlay (%)</Label>
+                  <Input
+                    className="rounded-[18px] border-transparent px-4"
+                    id="overlayOpacity"
+                    max={100}
+                    min={0}
+                    name="overlayOpacity"
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        overview: {
+                          ...current.overview,
+                          memberCta: {
+                            ...current.overview.memberCta,
+                            overlayOpacity: Number.parseInt(event.target.value || "0", 10) || 0,
+                          },
+                        },
+                      }))
+                    }
+                    step={1}
+                    type="number"
+                    value={draft.overview.memberCta.overlayOpacity ?? 52}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <TextField
+                  label="Link Tombol"
+                  name="buttonHref"
+                  onChange={(value) =>
+                    updateSection("overview", {
+                      memberCta: {
+                        ...draft.overview.memberCta,
+                        buttonHref: value,
+                      },
+                    })
+                  }
+                  value={draft.overview.memberCta.buttonHref}
+                />
+                <p className="text-xs leading-6 text-stone-500">
+                  Contoh: <code>/signup</code>, <code>/guide</code>, <code>https://aiotrade...</code>
+                </p>
+              </div>
+              <Button type="submit">Simpan CTA Member</Button>
+            </form>
+          </CardContent>
+        </Card>
+
         <Card className={cn(adminCardClass, "scroll-mt-24")} id="overview-section">
           <CardHeader>
             <CardTitle>Overview Section</CardTitle>
@@ -557,6 +704,14 @@ export function HomepageSettingsView({
             <form action={updateOverviewSectionAction} className="space-y-5">
               <input name="titleBlue" type="hidden" value={draft.overview.titleBlue} />
               <input name="titleWhite" type="hidden" value={draft.overview.titleWhite} />
+              <input name="memberCtaTitle" type="hidden" value={draft.overview.memberCta.title} />
+              <input name="memberCtaDescription" type="hidden" value={draft.overview.memberCta.description} />
+              <input name="memberCtaButtonLabel" type="hidden" value={draft.overview.memberCta.buttonLabel} />
+              <input name="memberCtaButtonHref" type="hidden" value={draft.overview.memberCta.buttonHref} />
+              <input name="memberCtaBackgroundImageAssetId" type="hidden" value={draft.overview.memberCta.backgroundImageAssetId ?? ""} />
+              <input name="memberCtaBackgroundImageUrl" type="hidden" value={draft.overview.memberCta.backgroundImageUrl ?? ""} />
+              <input name="memberCtaOverlayColor" type="hidden" value={draft.overview.memberCta.overlayColor ?? "#07101d"} />
+              <input name="memberCtaOverlayOpacity" type="hidden" value={String(draft.overview.memberCta.overlayOpacity ?? 52)} />
               <div className="admin-note-surface rounded-2xl px-4 py-3 text-sm leading-6">
                 Logo overview memakai asset brand yang sama dengan footer agar tampil konsisten di
                 desktop dan mobile. Ukuran tampilnya bisa kamu atur di bawah tanpa mengganti asset

@@ -82,11 +82,13 @@ const englishMemberShellLabels = {
     guideSetupBot: "Learning Center: eCourse",
     guideStart: "Learning Center: Getting Started",
     guideStrategy: "Learning Center: AIOTrade",
+    joinAiotrade: "Join AIOTrade",
     subscription: "Subscription",
   },
   openMenu: "Open menu",
   primaryItems: {
     dashboard: "Dashboard",
+    joinAiotrade: "Join AIOTrade",
     subscription: "Subscription",
   },
   sidebarDescription: "Access your account information and guides.",

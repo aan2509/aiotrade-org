@@ -26,11 +26,13 @@ export type MemberShellLabels = {
     guideSetupBot: string;
     guideStart: string;
     guideStrategy: string;
+    joinAiotrade: string;
     subscription: string;
   };
   openMenu: string;
   primaryItems: {
     dashboard: string;
+    joinAiotrade: string;
     subscription: string;
   };
   sidebarDescription: string;
@@ -65,11 +67,13 @@ export const defaultMemberShellLabels: MemberShellLabels = {
     guideSetupBot: "Pusat Belajar: eCourse",
     guideStart: "Pusat Belajar: Mulai",
     guideStrategy: "Pusat Belajar: AIOTrade",
+    joinAiotrade: "Daftar AIOTrade",
     subscription: "Langganan",
   },
   openMenu: "Buka menu",
   primaryItems: {
     dashboard: "Dashboard",
+    joinAiotrade: "Daftar AIOTrade",
     subscription: "Langganan",
   },
   sidebarDescription: "Akses informasi akun dan panduan.",

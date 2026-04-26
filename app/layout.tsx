@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { SiteVisitTracker } from "@/components/analytics/site-visit-tracker";
 import { buildRootMetadata, getSiteSeoSettings } from "@/lib/site-seo";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full overflow-x-clip bg-background text-foreground font-sans">
+        <SiteVisitTracker />
         <div className="flex min-h-full flex-col">{children}</div>
       </body>
     </html>

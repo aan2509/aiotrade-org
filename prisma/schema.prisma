@@ -281,3 +281,16 @@ model MemberGuideUnlock {
   @@index([guidePostId], map: "member_guide_unlocks_guide_post_id_idx")
   @@map("member_guide_unlocks")
 }
+
+model SiteVisitEvent {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  visitorId String   @map("visitor_id")
+  path      String
+  referrer  String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt], map: "site_visit_events_created_at_idx")
+  @@index([visitorId], map: "site_visit_events_visitor_id_idx")
+  @@map("site_visit_events")
+}

@@ -28,6 +28,16 @@ const overviewSchema = z.object({
   description: z.string().min(1),
   ctaLabel: z.string().min(1),
   ctaHref: z.string().min(1),
+  memberCta: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    buttonLabel: z.string().min(1),
+    buttonHref: z.string().min(1),
+    backgroundImageAssetId: z.string().optional(),
+    backgroundImageUrl: z.string().optional(),
+    overlayColor: z.string().optional(),
+    overlayOpacity: z.number().min(0).max(100).optional(),
+  }),
   buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   logoSize: z.object({
     mobileWidth: z.number().int().min(150).max(320),
@@ -185,6 +195,17 @@ export const defaultHomepageContent: HomepageContent = {
       "Alat bantu trading otomatis berbasis Artificial Intelligence (AI) yang dirancang untuk membantu pengguna menjalankan trading aset kripto di pasar spot. AIOTrade terhubung dengan Binance, Tokocrypto, dan Bitget melalui API yang aman, sehingga strategi dapat dijalankan lebih rapi, efisien, dan konsisten.",
     ctaLabel: "Daftar Sekarang",
     ctaHref: "/signup",
+    memberCta: {
+      title: "Gabung ke ekosistem AIOTrade",
+      description:
+        "Lanjutkan proses pendaftaran ke AIOTrade melalui halaman tujuan yang sudah disiapkan admin. Tombol di bawah akan membawa Anda ke link join terbaru.",
+      buttonLabel: "Daftar AIOTrade",
+      buttonHref: "/signup",
+      backgroundImageAssetId: undefined,
+      backgroundImageUrl: undefined,
+      overlayColor: "#07101d",
+      overlayOpacity: 52,
+    },
     buttonPalette: "glass-default",
     logoSize: {
       mobileWidth: 188,

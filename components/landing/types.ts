@@ -131,6 +131,16 @@ export type OverviewContent = {
   description: string;
   ctaLabel: string;
   ctaHref: string;
+  memberCta: {
+    title: string;
+    description: string;
+    buttonLabel: string;
+    buttonHref: string;
+    backgroundImageAssetId?: string;
+    backgroundImageUrl?: string;
+    overlayColor?: string;
+    overlayOpacity?: number;
+  };
   buttonPalette: ButtonPaletteKey;
   logoSize: LogoSizeConfig;
 };

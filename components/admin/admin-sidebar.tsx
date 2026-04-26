@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
+  ChartColumn,
   ChevronDown,
   CreditCard,
   KeyRound,
@@ -97,6 +98,7 @@ export function AdminSidebar({ onThemeChange, pathname, theme, username }: Admin
   const isPaymentsRoute = resolvedPathname === "/admin/payments";
   const isSeoRoute = resolvedPathname === "/admin/seo";
   const isUsersRoute = resolvedPathname === "/admin/users";
+  const isStatsRoute = resolvedPathname === "/admin/stats";
   const [homepageExpanded, setHomepageExpanded] = useState(isHomepageRoute);
   const [postsExpanded, setPostsExpanded] = useState(isPostsRoute);
   const [memberPostsExpanded, setMemberPostsExpanded] = useState(isMemberPostsRoute);
@@ -208,6 +210,14 @@ export function AdminSidebar({ onThemeChange, pathname, theme, username }: Admin
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <nav className="space-y-2.5">
+          <Link
+            className={primaryLinkClass(isStatsRoute)}
+            href="/admin/stats"
+          >
+            <ChartColumn className="h-4 w-4" />
+            Statistik
+          </Link>
+
           <Link
             className={primaryLinkClass(isUsersRoute)}
             href="/admin/users"

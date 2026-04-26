@@ -3,9 +3,10 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sectionBackgroundSchema } from "@/lib/homepage-backgrounds";
+import { clampOpacity, normalizeHexColor } from "@/lib/homepage-backgrounds";
 import { normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
 import { requireAdminProfile } from "@/lib/auth";
-import { updateHomepageContentSection } from "@/lib/homepage-content";
+import { getHomepageContent, updateHomepageContentSection } from "@/lib/homepage-content";
 
 function readString(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -70,6 +71,16 @@ const overviewSchema = z.object({
   description: z.string().min(1),
   ctaLabel: z.string().min(1),
   ctaHref: z.string().min(1),
+  memberCta: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    buttonLabel: z.string().min(1),
+    buttonHref: z.string().min(1),
+    backgroundImageAssetId: z.string().optional(),
+    backgroundImageUrl: z.string().optional(),
+    overlayColor: z.string().optional(),
+    overlayOpacity: z.number().min(0).max(100).optional(),
+  }),
   buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   logoSize: z.object({
     mobileWidth: z.number().int().min(150).max(320),
@@ -78,6 +89,17 @@ const overviewSchema = z.object({
     message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
     path: ["desktopWidth"],
   }),
+});
+
+const memberJoinCtaSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  buttonLabel: z.string().min(1),
+  buttonHref: z.string().min(1),
+  backgroundImageAssetId: z.string().optional(),
+  backgroundImageUrl: z.string().optional(),
+  overlayColor: z.string().optional(),
+  overlayOpacity: z.number().min(0).max(100).optional(),
 });
 
 const benefitsSchema = z.object({
@@ -244,6 +266,16 @@ export async function updateOverviewSectionAction(formData: FormData) {
     description: readString(formData, "description"),
     ctaLabel: readString(formData, "ctaLabel"),
     ctaHref: readString(formData, "ctaHref"),
+    memberCta: {
+      title: readString(formData, "memberCtaTitle"),
+      description: readString(formData, "memberCtaDescription"),
+      buttonLabel: readString(formData, "memberCtaButtonLabel"),
+      buttonHref: readString(formData, "memberCtaButtonHref"),
+      backgroundImageAssetId: readString(formData, "memberCtaBackgroundImageAssetId") || undefined,
+      backgroundImageUrl: readString(formData, "memberCtaBackgroundImageUrl") || undefined,
+      overlayColor: normalizeHexColor(readString(formData, "memberCtaOverlayColor"), "#07101d"),
+      overlayOpacity: clampOpacity(readNumber(formData, "memberCtaOverlayOpacity"), 52),
+    },
     buttonPalette: readString(formData, "buttonPalette") || "glass-default",
     logoSize: {
       mobileWidth: readNumber(formData, "logoMobileWidth") ?? 188,
@@ -257,6 +289,34 @@ export async function updateOverviewSectionAction(formData: FormData) {
 
   await updateHomepageContentSection("overview", parsed.data);
   redirectToSection("overview", "saved");
+}
+
+export async function updateMemberJoinCtaAction(formData: FormData) {
+  await requireAdminProfile();
+
+  const parsed = memberJoinCtaSchema.safeParse({
+    title: readString(formData, "title"),
+    description: readString(formData, "description"),
+    buttonLabel: readString(formData, "buttonLabel"),
+    buttonHref: readString(formData, "buttonHref"),
+    backgroundImageAssetId: readString(formData, "backgroundImageAssetId") || undefined,
+    backgroundImageUrl: readString(formData, "backgroundImageUrl") || undefined,
+    overlayColor: normalizeHexColor(readString(formData, "overlayColor"), "#07101d"),
+    overlayOpacity: clampOpacity(readNumber(formData, "overlayOpacity"), 52),
+  });
+
+  if (!parsed.success) {
+    redirectToSection("memberJoinCta", "error");
+  }
+
+  const content = await getHomepageContent();
+
+  await updateHomepageContentSection("overview", {
+    ...content.overview,
+    memberCta: parsed.data,
+  });
+
+  redirectToSection("memberJoinCta", "saved");
 }
 
 export async function updateBenefitsSectionAction(formData: FormData) {
